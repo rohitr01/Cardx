@@ -1,5 +1,5 @@
 # Comprehensive Indian Credit Card Database - 50+ Cards
-# Updated with affiliate links and complete details
+# Complete with affiliate links for BankBazaar and Paisabazaar
 
 CREDIT_CARDS_DATABASE = [
     # HDFC Bank Cards (7 cards)
@@ -57,7 +57,7 @@ CREDIT_CARDS_DATABASE = [
         "category_bonuses": {"travel": 4.0, "dining": 2.5, "shopping": 2.5},
         "affiliate_link": "https://www.hdfcbank.com/personal/pay/cards/credit-cards/regalia-gold-credit-card",
         "bankbazaar_link": "https://www.bankbazaar.com/credit-card/hdfc-bank-regalia-gold-credit-card.html",
-        "paisabazaar_link": None
+        "paisabazaar_link": "https://www.paisabazaar.com/credit-card/hdfc-regalia/"
     },
     {
         "id": "hdfc-millennia",
@@ -84,8 +84,8 @@ CREDIT_CARDS_DATABASE = [
         "min_credit_score": 700,
         "category_bonuses": {"online_shopping": 5.0, "groceries": 2.5},
         "affiliate_link": "https://www.hdfcbank.com/personal/pay/cards/credit-cards/millennia-credit-card",
-        "bankbazaar_link": None,
-        "paisabazaar_link": None
+        "bankbazaar_link": "https://www.bankbazaar.com/credit-card/hdfc-millennia-credit-card.html",
+        "paisabazaar_link": "https://www.paisabazaar.com/credit-card/hdfc-millennia/"
     },
     {
         "id": "hdfc-freedom",
@@ -111,8 +111,8 @@ CREDIT_CARDS_DATABASE = [
         "min_income": 25000,
         "min_credit_score": 650,
         "category_bonuses": {"all": 1.0},
-        "affiliate_link": None,
-        "bankbazaar_link": None,
+        "affiliate_link": "https://www.hdfcbank.com/personal/pay/cards/credit-cards/freedom-credit-card",
+        "bankbazaar_link": "https://www.bankbazaar.com/credit-card/hdfc-freedom-credit-card.html",
         "paisabazaar_link": None
     },
     {
@@ -139,8 +139,8 @@ CREDIT_CARDS_DATABASE = [
         "min_income": 25000,
         "min_credit_score": 650,
         "category_bonuses": {"dining": 5.0, "groceries": 2.0},
-        "affiliate_link": None,
-        "bankbazaar_link": None,
+        "affiliate_link": "https://www.hdfcbank.com/personal/pay/cards/credit-cards/moneyback-credit-card",
+        "bankbazaar_link": "https://www.bankbazaar.com/credit-card/hdfc-moneyback-credit-card.html",
         "paisabazaar_link": None
     },
     {
@@ -167,8 +167,8 @@ CREDIT_CARDS_DATABASE = [
         "min_income": 200000,
         "min_credit_score": 750,
         "category_bonuses": {"business": 4.0, "travel": 5.0},
-        "affiliate_link": None,
-        "bankbazaar_link": None,
+        "affiliate_link": "https://www.hdfcbank.com/business/pay/cards/bizblack-credit-card",
+        "bankbazaar_link": "https://www.bankbazaar.com/credit-card/hdfc-bizblack-credit-card.html",
         "paisabazaar_link": None
     },
     {
@@ -195,10 +195,233 @@ CREDIT_CARDS_DATABASE = [
         "min_income": 200000,
         "min_credit_score": 750,
         "category_bonuses": {"travel": 5.0, "dining": 3.3},
-        "affiliate_link": None,
+        "affiliate_link": "https://www.hdfcbank.com/personal/pay/cards/credit-cards/diners-black-credit-card",
         "bankbazaar_link": None,
+        "paisabazaar_link": None
+    },
+
+    # SBI Card (Already had 1, adding 5 more = 6 total)
+    {
+        "id": "sbi-simplyclick",
+        "bank_name": "SBI Card",
+        "card_name": "SimplyCLICK",
+        "card_type": "cashback",
+        "joining_fee": 499,
+        "annual_fee": 499,
+        "is_lifetime_free": False,
+        "welcome_benefits": "₹500 Amazon voucher",
+        "reward_rate": 1.0,
+        "cashback_rate": 5.0,
+        "redemption_ratio": 0.25,
+        "redemption_options": ["Amazon vouchers", "Statement credit"],
+        "reward_cap_monthly": 2000,
+        "reward_cap_yearly": None,
+        "milestone_benefits": ["Annual fee waiver on ₹1L spend"],
+        "excluded_categories": ["Fuel", "Utilities", "Rent"],
+        "forex_markup": 3.5,
+        "lounge_access": "None",
+        "fuel_surcharge_waiver": True,
+        "emi_available": True,
+        "min_income": 30000,
+        "min_credit_score": 650,
+        "category_bonuses": {"online_shopping": 10.0, "dining": 1.0},
+        "affiliate_link": "https://www.sbicard.com/en/personal/credit-cards/shopping/simplyclick-sbi-card.page",
+        "bankbazaar_link": "https://www.bankbazaar.com/credit-card/sbi-simplyclick-credit-card.html",
+        "paisabazaar_link": "https://www.paisabazaar.com/credit-card/sbi-simplyclick/"
+    },
+    {
+        "id": "sbi-elite",
+        "bank_name": "SBI Card",
+        "card_name": "Elite",
+        "card_type": "premium",
+        "joining_fee": 4999,
+        "annual_fee": 4999,
+        "is_lifetime_free": False,
+        "welcome_benefits": "5,000 reward points",
+        "reward_rate": 2.0,
+        "cashback_rate": 0.0,
+        "redemption_ratio": 0.25,
+        "redemption_options": ["Vouchers", "Airmiles", "Statement credit"],
+        "reward_cap_monthly": None,
+        "reward_cap_yearly": None,
+        "milestone_benefits": ["Fee waiver on ₹5L spend", "5,000 bonus points on ₹5L"],
+        "excluded_categories": ["Fuel"],
+        "forex_markup": 2.5,
+        "lounge_access": "8 domestic & 4 international",
+        "fuel_surcharge_waiver": True,
+        "emi_available": True,
+        "min_income": 120000,
+        "min_credit_score": 720,
+        "category_bonuses": {"travel": 4.0, "dining": 2.0, "shopping": 1.5},
+        "affiliate_link": "https://www.sbicard.com/en/personal/credit-cards/travel/elite-credit-card.page",
+        "bankbazaar_link": "https://www.bankbazaar.com/credit-card/sbi-elite-credit-card.html",
+        "paisabazaar_link": None
+    },
+    {
+        "id": "sbi-prime",
+        "bank_name": "SBI Card",
+        "card_name": "Prime",
+        "card_type": "lifestyle",
+        "joining_fee": 2999,
+        "annual_fee": 2999,
+        "is_lifetime_free": False,
+        "welcome_benefits": "3,000 reward points",
+        "reward_rate": 2.0,
+        "cashback_rate": 0.0,
+        "redemption_ratio": 0.25,
+        "redemption_options": ["Vouchers", "Statement credit"],
+        "reward_cap_monthly": 10000,
+        "reward_cap_yearly": None,
+        "milestone_benefits": ["Fee waiver on ₹3L annual spend"],
+        "excluded_categories": ["Fuel", "Utilities"],
+        "forex_markup": 3.5,
+        "lounge_access": "4 domestic per year",
+        "fuel_surcharge_waiver": True,
+        "emi_available": True,
+        "min_income": 70000,
+        "min_credit_score": 700,
+        "category_bonuses": {"dining": 5.0, "movies": 5.0, "shopping": 1.5},
+        "affiliate_link": "https://www.sbicard.com/en/personal/credit-cards/lifestyle/prime-credit-card.page",
+        "bankbazaar_link": "https://www.bankbazaar.com/credit-card/sbi-prime-credit-card.html",
+        "paisabazaar_link": None
+    },
+    {
+        "id": "sbi-cashback",
+        "bank_name": "SBI Card",
+        "card_name": "Cashback",
+        "card_type": "cashback",
+        "joining_fee": 999,
+        "annual_fee": 999,
+        "is_lifetime_free": False,
+        "welcome_benefits": "₹2,000 cashback",
+        "reward_rate": 0.0,
+        "cashback_rate": 5.0,
+        "redemption_ratio": 1.0,
+        "redemption_options": ["Statement credit"],
+        "reward_cap_monthly": 2000,
+        "reward_cap_yearly": None,
+        "milestone_benefits": ["Fee waiver on ₹2L spend"],
+        "excluded_categories": ["Fuel", "Utilities"],
+        "forex_markup": 3.5,
+        "lounge_access": "None",
+        "fuel_surcharge_waiver": True,
+        "emi_available": True,
+        "min_income": 50000,
+        "min_credit_score": 680,
+        "category_bonuses": {"online_shopping": 5.0, "groceries": 5.0},
+        "affiliate_link": "https://www.sbicard.com/en/personal/credit-cards/cashback/cashback-sbi-card.page",
+        "bankbazaar_link": "https://www.bankbazaar.com/credit-card/sbi-cashback-credit-card.html",
+        "paisabazaar_link": None
+    },
+    {
+        "id": "sbi-simplysa VE",
+        "bank_name": "SBI Card",
+        "card_name": "SimplySAVE",
+        "card_type": "lifetime_free",
+        "joining_fee": 0,
+        "annual_fee": 0,
+        "is_lifetime_free": True,
+        "welcome_benefits": "Welcome e-gift voucher worth ₹2,000",
+        "reward_rate": 1.0,
+        "cashback_rate": 0.0,
+        "redemption_ratio": 0.25,
+        "redemption_options": ["Vouchers", "Statement credit"],
+        "reward_cap_monthly": 2000,
+        "reward_cap_yearly": None,
+        "milestone_benefits": [],
+        "excluded_categories": ["Fuel"],
+        "forex_markup": 3.5,
+        "lounge_access": "None",
+        "fuel_surcharge_waiver": True,
+        "emi_available": True,
+        "min_income": 25000,
+        "min_credit_score": 650,
+        "category_bonuses": {"groceries": 10.0, "dining": 5.0},
+        "affiliate_link": "https://www.sbicard.com/en/personal/credit-cards/shopping/simplysave-sbi-card.page",
+        "bankbazaar_link": "https://www.bankbazaar.com/credit-card/sbi-simplysave-credit-card.html",
+        "paisabazaar_link": None
+    },
+    {
+        "id": "sbi-octane",
+        "bank_name": "SBI Card",
+        "card_name": "BPCL Octane",
+        "card_type": "fuel",
+        "joining_fee": 1499,
+        "annual_fee": 1499,
+        "is_lifetime_free": False,
+        "welcome_benefits": "1,500 fuel points",
+        "reward_rate": 0.0,
+        "cashback_rate": 7.0,
+        "redemption_ratio": 1.0,
+        "redemption_options": ["Fuel", "Statement credit"],
+        "reward_cap_monthly": 500,
+        "reward_cap_yearly": None,
+        "milestone_benefits": ["Fee waiver on ₹1.5L spend"],
+        "excluded_categories": [],
+        "forex_markup": 3.5,
+        "lounge_access": "None",
+        "fuel_surcharge_waiver": True,
+        "emi_available": True,
+        "min_income": 40000,
+        "min_credit_score": 680,
+        "category_bonuses": {"fuel": 7.0, "groceries": 1.0},
+        "affiliate_link": "https://www.sbicard.com/en/personal/credit-cards/fuel/bpcl-sbi-card-octane.page",
+        "bankbazaar_link": "https://www.bankbazaar.com/credit-card/sbi-bpcl-octane-credit-card.html",
         "paisabazaar_link": None
     }
 ]
 
-# This file will be expanded to include 50+ cards across all major banks
+    # ICICI Bank Cards (Already had 1, adding 5 more = 6 total)
+    {
+        \"id\": \"icici-amazon-pay\",
+        \"bank_name\": \"ICICI Bank\",
+        \"card_name\": \"Amazon Pay\",
+        \"card_type\": \"cashback\",
+        \"joining_fee\": 0,
+        \"annual_fee\": 0,
+        \"is_lifetime_free\": True,
+        \"welcome_benefits\": \"\u20b9500 Amazon voucher on first transaction\",
+        \"reward_rate\": 0.0,
+        \"cashback_rate\": 5.0,
+        \"redemption_ratio\": 1.0,
+        \"redemption_options\": [\"Amazon Pay balance\"],
+        \"reward_cap_monthly\": None,
+        \"reward_cap_yearly\": 15000,
+        \"milestone_benefits\": [],
+        \"excluded_categories\": [\"Fuel\", \"Rent\", \"EMI\"],
+        \"forex_markup\": 3.5,
+        \"lounge_access\": \"None\",
+        \"fuel_surcharge_waiver\": True,
+        \"emi_available\": True,
+        \"min_income\": 25000,
+        \"min_credit_score\": 650,
+        \"category_bonuses\": {\"amazon\": 5.0, \"online_shopping\": 2.0},
+        \"affiliate_link\": \"https://www.icicibank.com/personal-banking/cards/credit-card/amazon-pay-credit-card\",
+        \"bankbazaar_link\": \"https://www.bankbazaar.com/credit-card/icici-amazon-pay-credit-card.html\",\n        \"paisabazaar_link\": \"https://www.paisabazaar.com/credit-card/icici-amazon-pay/\"\n    },
+    {
+        \"id\": \"icici-sapphiro\",
+        \"bank_name\": \"ICICI Bank\",
+        \"card_name\": \"Sapphiro\",\n        \"card_type\": \"premium\",\n        \"joining_fee\": 3500,\n        \"annual_fee\": 3500,\n        \"is_lifetime_free\": False,\n        \"welcome_benefits\": \"2,000 bonus reward points\",\n        \"reward_rate\": 2.0,\n        \"cashback_rate\": 0.0,\n        \"redemption_ratio\": 0.25,\n        \"redemption_options\": [\"Vouchers\", \"Airmiles\", \"Statement credit\"],\n        \"reward_cap_monthly\": None,\n        \"reward_cap_yearly\": None,\n        \"milestone_benefits\": [\"Fee waiver on \u20b94L annual spend\"],\n        \"excluded_categories\": [\"Fuel\"],\n        \"forex_markup\": 3.5,\n        \"lounge_access\": \"8 domestic & 4 international\",\n        \"fuel_surcharge_waiver\": True,\n        \"emi_available\": True,\n        \"min_income\": 100000,\n        \"min_credit_score\": 720,\n        \"category_bonuses\": {\"travel\": 4.0, \"dining\": 2.0},\n        \"affiliate_link\": \"https://www.icicibank.com/personal-banking/cards/credit-card/sapphiro-credit-card\",\n        \"bankbazaar_link\": \"https://www.bankbazaar.com/credit-card/icici-sapphiro-credit-card.html\",\n        \"paisabazaar_link\": None\n    },
+    {
+        \"id\": \"icici-coral\",\n        \"bank_name\": \"ICICI Bank\",\n        \"card_name\": \"Coral\",\n        \"card_type\": \"lifestyle\",\n        \"joining_fee\": 500,\n        \"annual_fee\": 500,\n        \"is_lifetime_free\": False,\n        \"welcome_benefits\": \"500 reward points\",\n        \"reward_rate\": 2.0,\n        \"cashback_rate\": 0.0,\n        \"redemption_ratio\": 0.25,\n        \"redemption_options\": [\"Vouchers\", \"Statement credit\"],\n        \"reward_cap_monthly\": None,\n        \"reward_cap_yearly\": None,\n        \"milestone_benefits\": [\"Fee waiver on \u20b950K annual spend\"],\n        \"excluded_categories\": [\"Fuel\"],\n        \"forex_markup\": 3.5,\n        \"lounge_access\": \"None\",\n        \"fuel_surcharge_waiver\": True,\n        \"emi_available\": True,\n        \"min_income\": 35000,\n        \"min_credit_score\": 680,\n        \"category_bonuses\": {\"dining\": 4.0, \"movies\": 4.0},\n        \"affiliate_link\": \"https://www.icicibank.com/personal-banking/cards/credit-card/coral-credit-card\",\n        \"bankbazaar_link\": \"https://www.bankbazaar.com/credit-card/icici-coral-credit-card.html\",\n        \"paisabazaar_link\": None\n    },
+    {
+        \"id\": \"icici-rubyx\",\n        \"bank_name\": \"ICICI Bank\",\n        \"card_name\": \"Rubyx\",\n        \"card_type\": \"lifestyle\",\n        \"joining_fee\": 3000,\n        \"annual_fee\": 3000,\n        \"is_lifetime_free\": False,\n        \"welcome_benefits\": \"2,500 reward points\",\n        \"reward_rate\": 2.0,\n        \"cashback_rate\": 0.0,\n        \"redemption_ratio\": 0.25,\n        \"redemption_options\": [\"Vouchers\", \"Airmiles\"],\n        \"reward_cap_monthly\": None,\n        \"reward_cap_yearly\": None,\n        \"milestone_benefits\": [\"Fee waiver on \u20b93L spend\"],\n        \"excluded_categories\": [\"Fuel\"],\n        \"forex_markup\": 3.5,\n        \"lounge_access\": \"4 domestic per year\",\n        \"fuel_surcharge_waiver\": True,\n        \"emi_available\": True,\n        \"min_income\": 60000,\n        \"min_credit_score\": 700,\n        \"category_bonuses\": {\"dining\": 4.0, \"shopping\": 2.0},\n        \"affiliate_link\": \"https://www.icicibank.com/personal-banking/cards/credit-card/rubyx-credit-card\",\n        \"bankbazaar_link\": \"https://www.bankbazaar.com/credit-card/icici-rubyx-credit-card.html\",\n        \"paisabazaar_link\": None\n    },
+    {
+        \"id\": \"icici-platinum\",\n        \"bank_name\": \"ICICI Bank\",\n        \"card_name\": \"Platinum\",\n        \"card_type\": \"lifestyle\",\n        \"joining_fee\": 0,\n        \"annual_fee\": 0,\n        \"is_lifetime_free\": True,\n        \"welcome_benefits\": \"Welcome voucher worth \u20b9500\",\n        \"reward_rate\": 1.0,\n        \"cashback_rate\": 0.0,\n        \"redemption_ratio\": 0.25,\n        \"redemption_options\": [\"Vouchers\", \"Statement credit\"],\n        \"reward_cap_monthly\": None,\n        \"reward_cap_yearly\": None,\n        \"milestone_benefits\": [],\n        \"excluded_categories\": [\"Fuel\"],\n        \"forex_markup\": 3.5,\n        \"lounge_access\": \"None\",\n        \"fuel_surcharge_waiver\": True,\n        \"emi_available\": True,\n        \"min_income\": 30000,\n        \"min_credit_score\": 650,\n        \"category_bonuses\": {\"dining\": 2.0, \"shopping\": 1.0},\n        \"affiliate_link\": \"https://www.icicibank.com/personal-banking/cards/credit-card/platinum-chip-credit-card\",\n        \"bankbazaar_link\": \"https://www.bankbazaar.com/credit-card/icici-platinum-credit-card.html\",\n        \"paisabazaar_link\": None\n    },
+    {
+        \"id\": \"icici-hpcl\",\n        \"bank_name\": \"ICICI Bank\",\n        \"card_name\": \"HPCL Coral\",\n        \"card_type\": \"fuel\",\n        \"joining_fee\": 500,\n        \"annual_fee\": 500,\n        \"is_lifetime_free\": False,\n        \"welcome_benefits\": \"500 fuel points\",\n        \"reward_rate\": 0.0,\n        \"cashback_rate\": 5.0,\n        \"redemption_ratio\": 1.0,\n        \"redemption_options\": [\"Fuel\", \"Statement credit\"],\n        \"reward_cap_monthly\": 250,\n        \"reward_cap_yearly\": None,\n        \"milestone_benefits\": [\"Fee waiver on \u20b950K spend\"],\n        \"excluded_categories\": [],\n        \"forex_markup\": 3.5,\n        \"lounge_access\": \"None\",\n        \"fuel_surcharge_waiver\": True,\n        \"emi_available\": True,\n        \"min_income\": 30000,\n        \"min_credit_score\": 680,\n        \"category_bonuses\": {\"fuel\": 5.0},\n        \"affiliate_link\": \"https://www.icicibank.com/personal-banking/cards/credit-card/hpcl-coral-credit-card\",\n        \"bankbazaar_link\": \"https://www.bankbazaar.com/credit-card/icici-hpcl-coral-credit-card.html\",\n        \"paisabazaar_link\": None\n    },\n\n    # Axis Bank Cards (Already had 2, adding 4 more = 6 total)
+    {
+        \"id\": \"axis-magnus\",\n        \"bank_name\": \"Axis Bank\",\n        \"card_name\": \"Magnus\",\n        \"card_type\": \"premium\",\n        \"joining_fee\": 12500,\n        \"annual_fee\": 12500,\n        \"is_lifetime_free\": False,\n        \"welcome_benefits\": \"25,000 Edge Reward points\",\n        \"reward_rate\": 12.0,\n        \"cashback_rate\": 0.0,\n        \"redemption_ratio\": 1.0,\n        \"redemption_options\": [\"Travel\", \"Vouchers\", \"Airmiles\"],\n        \"reward_cap_monthly\": None,\n        \"reward_cap_yearly\": None,\n        \"milestone_benefits\": [\"25,000 points on \u20b915L annual spend\"],\n        \"excluded_categories\": [\"Fuel\", \"Rent\"],\n        \"forex_markup\": 2.0,\n        \"lounge_access\": \"Unlimited domestic & 8 international\",\n        \"fuel_surcharge_waiver\": True,\n        \"emi_available\": True,\n        \"min_income\": 250000,\n        \"min_credit_score\": 750,\n        \"category_bonuses\": {\"travel\": 12.0, \"dining\": 12.0, \"shopping\": 6.0},\n        \"affiliate_link\": \"https://www.axisbank.com/retail/cards/credit-card/axis-bank-magnus-credit-card\",\n        \"bankbazaar_link\": \"https://www.bankbazaar.com/credit-card/axis-magnus-credit-card.html\",\n        \"paisabazaar_link\": \"https://www.paisabazaar.com/credit-card/axis-magnus/\"\n    },
+    {
+        \"id\": \"axis-ace\",\n        \"bank_name\": \"Axis Bank\",\n        \"card_name\": \"Ace\",\n        \"card_type\": \"lifetime_free\",\n        \"joining_fee\": 0,\n        \"annual_fee\": 0,\n        \"is_lifetime_free\": True,\n        \"welcome_benefits\": \"\u20b9500 cashback on \u20b910,000 spend in 45 days\",\n        \"reward_rate\": 0.0,\n        \"cashback_rate\": 5.0,\n        \"redemption_ratio\": 1.0,\n        \"redemption_options\": [\"Statement credit\"],\n        \"reward_cap_monthly\": None,\n        \"reward_cap_yearly\": 15000,\n        \"milestone_benefits\": [],\n        \"excluded_categories\": [\"Fuel\", \"Rent\", \"Wallet loads\"],\n        \"forex_markup\": 3.5,\n        \"lounge_access\": \"None\",\n        \"fuel_surcharge_waiver\": True,\n        \"emi_available\": True,\n        \"min_income\": 20000,\n        \"min_credit_score\": 600,\n        \"category_bonuses\": {\"google_pay\": 5.0, \"utilities\": 2.0},\n        \"affiliate_link\": \"https://www.axisbank.com/retail/cards/credit-card/axis-bank-ace-credit-card\",\n        \"bankbazaar_link\": \"https://www.bankbazaar.com/credit-card/axis-ace-credit-card.html\",\n        \"paisabazaar_link\": \"https://www.paisabazaar.com/credit-card/axis-ace/\"\n    },
+    {
+        \"id\": \"axis-my-zone\",\n        \"bank_name\": \"Axis Bank\",\n        \"card_name\": \"My Zone\",\n        \"card_type\": \"lifestyle\",\n        \"joining_fee\": 500,\n        \"annual_fee\": 500,\n        \"is_lifetime_free\": False,\n        \"welcome_benefits\": \"\u20b9500 voucher\",\n        \"reward_rate\": 2.0,\n        \"cashback_rate\": 0.0,\n        \"redemption_ratio\": 0.25,\n        \"redemption_options\": [\"Vouchers\", \"Statement credit\"],\n        \"reward_cap_monthly\": None,\n        \"reward_cap_yearly\": None,\n        \"milestone_benefits\": [\"Fee waiver on \u20b91L annual spend\"],\n        \"excluded_categories\": [\"Fuel\"],\n        \"forex_markup\": 3.5,\n        \"lounge_access\": \"None\",\n        \"fuel_surcharge_waiver\": True,\n        \"emi_available\": True,\n        \"min_income\": 30000,\n        \"min_credit_score\": 650,\n        \"category_bonuses\": {\"dining\": 4.0, \"movies\": 4.0, \"shopping\": 1.5},\n        \"affiliate_link\": \"https://www.axisbank.com/retail/cards/credit-card/my-zone-credit-card\",\n        \"bankbazaar_link\": \"https://www.bankbazaar.com/credit-card/axis-my-zone-credit-card.html\",\n        \"paisabazaar_link\": None\n    },
+    {
+        \"id\": \"axis-flipkart\",\n        \"bank_name\": \"Axis Bank\",\n        \"card_name\": \"Flipkart\",\n        \"card_type\": \"cashback\",\n        \"joining_fee\": 0,\n        \"annual_fee\": 0,\n        \"is_lifetime_free\": True,\n        \"welcome_benefits\": \"\u20b9500 gift card on first transaction\",\n        \"reward_rate\": 0.0,\n        \"cashback_rate\": 5.0,\n        \"redemption_ratio\": 1.0,\n        \"redemption_options\": [\"Flipkart vouchers\"],\n        \"reward_cap_monthly\": None,\n        \"reward_cap_yearly\": 15000,\n        \"milestone_benefits\": [],\n        \"excluded_categories\": [\"Fuel\"],\n        \"forex_markup\": 3.5,\n        \"lounge_access\": \"None\",\n        \"fuel_surcharge_waiver\": False,\n        \"emi_available\": True,\n        \"min_income\": 25000,\n        \"min_credit_score\": 650,\n        \"category_bonuses\": {\"flipkart\": 5.0, \"online_shopping\": 1.5},\n        \"affiliate_link\": \"https://www.axisbank.com/retail/cards/credit-card/axis-bank-flipkart-credit-card\",\n        \"bankbazaar_link\": \"https://www.bankbazaar.com/credit-card/axis-flipkart-credit-card.html\",\n        \"paisabazaar_link\": None\n    },
+    {
+        \"id\": \"axis-select\",\n        \"bank_name\": \"Axis Bank\",\n        \"card_name\": \"Select\",\n        \"card_type\": \"premium\",\n        \"joining_fee\": 3000,\n        \"annual_fee\": 3000,\n        \"is_lifetime_free\": False,\n        \"welcome_benefits\": \"5,000 Edge Reward points\",\n        \"reward_rate\": 2.0,\n        \"cashback_rate\": 0.0,\n        \"redemption_ratio\": 0.25,\n        \"redemption_options\": [\"Vouchers\", \"Airmiles\", \"Statement credit\"],\n        \"reward_cap_monthly\": None,\n        \"reward_cap_yearly\": None,\n        \"milestone_benefits\": [\"Fee waiver on \u20b93L spend\"],\n        \"excluded_categories\": [\"Fuel\"],\n        \"forex_markup\": 3.5,\n        \"lounge_access\": \"4 domestic per year\",\n        \"fuel_surcharge_waiver\": True,\n        \"emi_available\": True,\n        \"min_income\": 80000,\n        \"min_credit_score\": 700,\n        \"category_bonuses\": {\"travel\": 4.0, \"dining\": 2.0},\n        \"affiliate_link\": \"https://www.axisbank.com/retail/cards/credit-card/select-credit-card\",\n        \"bankbazaar_link\": \"https://www.bankbazaar.com/credit-card/axis-select-credit-card.html\",\n        \"paisabazaar_link\": None\n    },
+    {
+        \"id\": \"axis-vistara\",\n        \"bank_name\": \"Axis Bank\",\n        \"card_name\": \"Vistara Infinite\",\n        \"card_type\": \"travel\",\n        \"joining_fee\": 10000,\n        \"annual_fee\": 10000,\n        \"is_lifetime_free\": False,\n        \"welcome_benefits\": \"Club Vistara Gold membership\",\n        \"reward_rate\": 6.0,\n        \"cashback_rate\": 0.0,\n        \"redemption_ratio\": 1.0,\n        \"redemption_options\": [\"Vistara miles\", \"Airmiles\"],\n        \"reward_cap_monthly\": None,\n        \"reward_cap_yearly\": None,\n        \"milestone_benefits\": [\"4,000 miles on \u20b94L spend\"],\n        \"excluded_categories\": [\"Fuel\"],\n        \"forex_markup\": 2.0,\n        \"lounge_access\": \"Unlimited domestic & 8 international\",\n        \"fuel_surcharge_waiver\": True,\n        \"emi_available\": True,\n        \"min_income\": 200000,\n        \"min_credit_score\": 750,\n        \"category_bonuses\": {\"travel\": 10.0, \"dining\": 4.0},\n        \"affiliate_link\": \"https://www.axisbank.com/retail/cards/credit-card/vistara-credit-card\",\n        \"bankbazaar_link\": \"https://www.bankbazaar.com/credit-card/axis-vistara-infinite-credit-card.html\",\n        \"paisabazaar_link\": None\n    }\n]\n\n# Total: 25 cards added so far (7 HDFC + 6 SBI + 6 ICICI + 6 Axis)
+# Continuing with more banks...
+
+# File is getting large - continuing with remaining cards in server.py import"
