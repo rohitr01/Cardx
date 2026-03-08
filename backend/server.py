@@ -5,6 +5,7 @@ from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
+import uuid
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional, Dict, Any
@@ -19,6 +20,9 @@ load_dotenv(ROOT_DIR / '.env')
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
+
+# MongoDB Collections
+cards_collection = db['credit_cards']
 
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
@@ -63,7 +67,7 @@ class AdminCardCreate(BaseModel):
 # Hardcoded admin credentials (in production, use database with hashed passwords)
 ADMIN_USERS = {
     "admin@finselect.in": {
-        "password": "admin123",  # In production, this should be hashed
+        "password": "admin123",
         "role": "admin",
         "name": "Admin User"
     }
@@ -122,11 +126,13 @@ class AIRecommendationRequest(BaseModel):
     income: int
     credit_score: int
 
-# Import card database from cards_data.py
-INDIAN_CREDIT_CARDS = CREDIT_CARDS_DATABASE
-
-# Store cards in memory (in production, use database)
-cards_storage = INDIAN_CREDIT_CARDS.copy()
+# Helper function to get all cards from MongoDB
+async def get_cards_from_db():
+    cards = []
+    cursor = cards_collection.find({}, {"_id": 0})
+    async for card in cursor:
+        cards.append(card)
+    return cards
 
 # Authentication Routes
 @api_router.post("/auth/login", response_model=LoginResponse)
@@ -158,14 +164,15 @@ async def get_current_user_info(current_user: dict = Depends(get_current_user)):
 # Admin Routes
 @admin_router.get("/analytics")
 async def get_admin_analytics(current_user: dict = Depends(get_current_admin)):
-    total_cards = len(cards_storage)
-    active_cards = len([c for c in cards_storage if c.get("is_active", True)])
-    banks = len(set([c["bank_name"] for c in cards_storage]))
-    lifetime_free = len([c for c in cards_storage if c.get("is_lifetime_free")])
-    premium_cards = len([c for c in cards_storage if c.get("annual_fee", 0) > 5000])
+    cards = await get_cards_from_db()
+    total_cards = len(cards)
+    active_cards = len([c for c in cards if c.get("is_active", True)])
+    banks = len(set([c["bank_name"] for c in cards]))
+    lifetime_free = len([c for c in cards if c.get("is_lifetime_free")])
+    premium_cards = len([c for c in cards if c.get("annual_fee", 0) > 5000])
     
     card_types = {}
-    for card in cards_storage:
+    for card in cards:
         card_type = card.get("card_type", "other")
         card_types[card_type] = card_types.get(card_type, 0) + 1
     
@@ -184,33 +191,27 @@ async def create_card(card: AdminCardCreate, current_user: dict = Depends(get_cu
     # Generate ID from card name
     card_id = f"{card.bank_name.lower().replace(' ', '-')}-{card.card_name.lower().replace(' ', '-')}"
     
+    # Check if card already exists
+    existing = await cards_collection.find_one({"id": card_id})
+    if existing:
+        raise HTTPException(status_code=400, detail="Card with this ID already exists")
+    
     new_card = {
         "id": card_id,
         **card.dict()
     }
     
-    # Check if card already exists
-    if any(c["id"] == card_id for c in cards_storage):
-        raise HTTPException(status_code=400, detail="Card with this ID already exists")
+    await cards_collection.insert_one(new_card)
     
-    cards_storage.append(new_card)
-    
-    # Update the global INDIAN_CREDIT_CARDS list
-    global INDIAN_CREDIT_CARDS
-    INDIAN_CREDIT_CARDS = cards_storage.copy()
-    
+    # Return without _id
+    new_card.pop("_id", None)
     return {"message": "Card created successfully", "card": new_card}
 
 @admin_router.put("/cards/{card_id}")
 async def update_card(card_id: str, card: AdminCardCreate, current_user: dict = Depends(get_current_admin)):
-    # Find card index
-    card_index = None
-    for i, c in enumerate(cards_storage):
-        if c["id"] == card_id:
-            card_index = i
-            break
-    
-    if card_index is None:
+    # Check if card exists
+    existing = await cards_collection.find_one({"id": card_id})
+    if not existing:
         raise HTTPException(status_code=404, detail="Card not found")
     
     updated_card = {
@@ -218,37 +219,26 @@ async def update_card(card_id: str, card: AdminCardCreate, current_user: dict = 
         **card.dict()
     }
     
-    cards_storage[card_index] = updated_card
-    
-    # Update the global INDIAN_CREDIT_CARDS list
-    global INDIAN_CREDIT_CARDS
-    INDIAN_CREDIT_CARDS = cards_storage.copy()
+    await cards_collection.update_one({"id": card_id}, {"$set": updated_card})
     
     return {"message": "Card updated successfully", "card": updated_card}
 
 @admin_router.delete("/cards/{card_id}")
 async def delete_card(card_id: str, current_user: dict = Depends(get_current_admin)):
-    # Find and remove card
-    card_index = None
-    for i, c in enumerate(cards_storage):
-        if c["id"] == card_id:
-            card_index = i
-            break
-    
-    if card_index is None:
+    # Check if card exists
+    existing = await cards_collection.find_one({"id": card_id})
+    if not existing:
         raise HTTPException(status_code=404, detail="Card not found")
     
-    removed_card = cards_storage.pop(card_index)
+    await cards_collection.delete_one({"id": card_id})
     
-    # Update the global INDIAN_CREDIT_CARDS list
-    global INDIAN_CREDIT_CARDS
-    INDIAN_CREDIT_CARDS = cards_storage.copy()
-    
-    return {"message": "Card deleted successfully", "card": removed_card}
+    # Remove _id before returning
+    existing.pop("_id", None)
+    return {"message": "Card deleted successfully", "card": existing}
 
 @admin_router.get("/cards")
 async def get_all_cards_admin(current_user: dict = Depends(get_current_admin)):
-    return cards_storage
+    return await get_cards_from_db()
 
 @api_router.get("/")
 async def root():
@@ -260,7 +250,8 @@ async def get_all_cards(
     bank_name: Optional[str] = Query(None),
     is_lifetime_free: Optional[bool] = Query(None)
 ):
-    cards = [CreditCard(**card) for card in INDIAN_CREDIT_CARDS]
+    cards_data = await get_cards_from_db()
+    cards = [CreditCard(**card) for card in cards_data]
     
     if card_type:
         cards = [c for c in cards if c.card_type == card_type]
@@ -273,15 +264,15 @@ async def get_all_cards(
 
 @api_router.get("/cards/{card_id}", response_model=CreditCard)
 async def get_card(card_id: str):
-    for card_data in INDIAN_CREDIT_CARDS:
-        card = CreditCard(**card_data)
-        if card.id == card_id:
-            return card
-    raise HTTPException(status_code=404, detail="Card not found")
+    card_data = await cards_collection.find_one({"id": card_id}, {"_id": 0})
+    if not card_data:
+        raise HTTPException(status_code=404, detail="Card not found")
+    return CreditCard(**card_data)
 
 @api_router.post("/cards/filter", response_model=List[CreditCard])
 async def filter_cards(filter_req: FilterRequest):
-    cards = [CreditCard(**card) for card in INDIAN_CREDIT_CARDS]
+    cards_data = await get_cards_from_db()
+    cards = [CreditCard(**card) for card in cards_data]
     
     if filter_req.income_range:
         cards = [c for c in cards if c.min_income <= filter_req.income_range]
@@ -306,15 +297,11 @@ async def filter_cards(filter_req: FilterRequest):
 
 @api_router.post("/calculate-rewards")
 async def calculate_rewards(calc_req: RewardCalculationRequest):
-    card = None
-    for card_data in INDIAN_CREDIT_CARDS:
-        temp_card = CreditCard(**card_data)
-        if temp_card.id == calc_req.card_id:
-            card = temp_card
-            break
-    
-    if not card:
+    card_data = await cards_collection.find_one({"id": calc_req.card_id}, {"_id": 0})
+    if not card_data:
         raise HTTPException(status_code=404, detail="Card not found")
+    
+    card = CreditCard(**card_data)
     
     monthly_rewards = 0
     category_breakdown = {}
@@ -359,17 +346,16 @@ async def compare_cards(compare_req: CompareRequest):
     
     cards = []
     for card_id in compare_req.card_ids:
-        for card_data in INDIAN_CREDIT_CARDS:
-            card = CreditCard(**card_data)
-            if card.id == card_id:
-                cards.append(card)
-                break
+        card_data = await cards_collection.find_one({"id": card_id}, {"_id": 0})
+        if card_data:
+            cards.append(CreditCard(**card_data))
     
     return cards
 
 @api_router.get("/insights/best-by-category")
 async def get_best_cards_by_category():
-    cards = [CreditCard(**card) for card in INDIAN_CREDIT_CARDS]
+    cards_data = await get_cards_from_db()
+    cards = [CreditCard(**card) for card in cards_data]
     
     best_fuel = max([c for c in cards if "fuel" in c.category_bonuses], 
                     key=lambda x: x.category_bonuses.get("fuel", 0), default=None)
@@ -439,7 +425,8 @@ Provide your response in this exact JSON format:
 
 @api_router.get("/banks")
 async def get_banks():
-    banks = list(set([card["bank_name"] for card in INDIAN_CREDIT_CARDS]))
+    cards = await get_cards_from_db()
+    banks = list(set([card["bank_name"] for card in cards]))
     return {"banks": sorted(banks)}
 
 app.include_router(api_router)
@@ -458,6 +445,18 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
+
+# Seed database with initial cards on startup
+@app.on_event("startup")
+async def seed_database():
+    count = await cards_collection.count_documents({})
+    if count == 0:
+        logger.info("Seeding database with initial credit cards...")
+        for card in CREDIT_CARDS_DATABASE:
+            await cards_collection.insert_one(card.copy())
+        logger.info(f"Seeded {len(CREDIT_CARDS_DATABASE)} credit cards to MongoDB")
+    else:
+        logger.info(f"Database already contains {count} credit cards")
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
