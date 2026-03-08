@@ -13,6 +13,7 @@ from datetime import datetime, timezone, timedelta
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 from cards_data import CREDIT_CARDS_DATABASE
 from auth import create_access_token, get_current_user, get_current_admin, security
+from models import CreditCardExtended, EligibilityCheckRequest, LeadCapture
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -23,6 +24,8 @@ db = client[os.environ['DB_NAME']]
 
 # MongoDB Collections
 cards_collection = db['credit_cards']
+reviews_collection = db['reviews']
+leads_collection = db['leads']
 
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
@@ -38,33 +41,101 @@ class LoginResponse(BaseModel):
     user: Dict[str, Any]
 
 class AdminCardCreate(BaseModel):
+    # Basic Info
     bank_name: str
     card_name: str
+    card_network: str = "Visa"
     card_type: str
-    joining_fee: int
-    annual_fee: int
-    is_lifetime_free: bool
-    welcome_benefits: str
-    reward_rate: float
-    cashback_rate: float
-    redemption_ratio: float
-    redemption_options: List[str]
+    category_tags: List[str] = []
+    image_url: Optional[str] = None
+    overall_rating: float = 4.0
+    
+    # Quick Highlights
+    joining_fee: int = 0
+    annual_fee: int = 0
+    is_lifetime_free: bool = False
+    reward_rate: float = 0
+    cashback_rate: float = 0
+    value_back_percent: float = 0
+    lounge_access_summary: str = ""
+    forex_markup: float = 3.5
+    welcome_bonus_summary: str = ""
+    
+    # About the Card
+    card_description: str = ""
+    best_suited_for: List[str] = []
+    key_benefits: List[str] = []
+    spending_categories: List[str] = []
+    
+    # Rewards Program
+    reward_earning: Optional[Dict[str, Any]] = None
+    reward_redemption: Optional[Dict[str, Any]] = None
+    redemption_ratio: float = 1.0
     reward_cap_monthly: Optional[int] = None
     reward_cap_yearly: Optional[int] = None
-    milestone_benefits: List[str]
-    excluded_categories: List[str]
-    forex_markup: float
-    lounge_access: str
-    fuel_surcharge_waiver: bool
-    emi_available: bool
-    min_income: int
-    min_credit_score: int
-    category_bonuses: Dict[str, float]
+    category_bonuses: Dict[str, float] = {}
+    redemption_options: List[str] = []
+    
+    # Welcome Benefits
+    welcome_benefits: str = ""
+    welcome_benefits_list: List[str] = []
+    welcome_bonus_conditions: Optional[str] = None
+    
+    # Milestone Benefits
+    milestone_benefits: List[str] = []
+    milestone_details: List[Dict[str, str]] = []
+    
+    # Travel Benefits
+    travel_benefits: Optional[Dict[str, Any]] = None
+    lounge_access: str = ""
+    fuel_surcharge_waiver: bool = False
+    
+    # Lifestyle Benefits
+    lifestyle_benefits: Optional[Dict[str, Any]] = None
+    
+    # Fees and Charges
+    fees_charges: Optional[Dict[str, Any]] = None
+    emi_available: bool = True
+    
+    # Excluded Categories
+    excluded_categories: List[str] = []
+    
+    # Eligibility
+    min_income: int = 0
+    min_credit_score: int = 700
+    eligibility_criteria: Optional[Dict[str, Any]] = None
+    
+    # Pros and Cons
+    pros: List[str] = []
+    cons: List[str] = []
+    
+    # Similar Cards
+    similar_cards: List[str] = []
+    
+    # Reviews
+    expert_rating: float = 4.0
+    expert_review: Optional[str] = None
+    category_ratings: Dict[str, float] = {}
+    
+    # FAQs
+    faqs: List[Dict[str, str]] = []
+    
+    # Apply Links
     affiliate_link: Optional[str] = None
     bankbazaar_link: Optional[str] = None
     paisabazaar_link: Optional[str] = None
+    bank_apply_link: Optional[str] = None
 
-# Hardcoded admin credentials (in production, use database with hashed passwords)
+# Review Submit Model
+class ReviewSubmit(BaseModel):
+    card_id: str
+    reviewer_name: str
+    rating: float
+    title: str
+    content: str
+    category_ratings: Dict[str, float] = {}
+
+# Hardcoded admin credentials
 ADMIN_USERS = {
     "admin@finselect.in": {
         "password": "admin123",
@@ -73,36 +144,65 @@ ADMIN_USERS = {
     }
 }
 
+# Backward compatible CreditCard model
 class CreditCard(BaseModel):
     model_config = ConfigDict(extra="ignore")
     
     id: str
     bank_name: str
     card_name: str
+    card_network: str = "Visa"
     card_type: str
-    joining_fee: int
-    annual_fee: int
-    is_lifetime_free: bool
-    welcome_benefits: str
-    reward_rate: float
-    cashback_rate: float
-    redemption_ratio: float
-    redemption_options: List[str]
+    category_tags: List[str] = []
+    image_url: Optional[str] = None
+    overall_rating: float = 4.0
+    joining_fee: int = 0
+    annual_fee: int = 0
+    is_lifetime_free: bool = False
+    reward_rate: float = 0
+    cashback_rate: float = 0
+    value_back_percent: float = 0
+    lounge_access_summary: str = ""
+    forex_markup: float = 3.5
+    welcome_bonus_summary: str = ""
+    card_description: str = ""
+    best_suited_for: List[str] = []
+    key_benefits: List[str] = []
+    spending_categories: List[str] = []
+    reward_earning: Optional[Dict[str, Any]] = None
+    reward_redemption: Optional[Dict[str, Any]] = None
+    redemption_ratio: float = 1.0
     reward_cap_monthly: Optional[int] = None
     reward_cap_yearly: Optional[int] = None
-    milestone_benefits: List[str]
-    excluded_categories: List[str]
-    forex_markup: float
-    lounge_access: str
-    fuel_surcharge_waiver: bool
-    emi_available: bool
-    min_income: int
-    min_credit_score: int
-    category_bonuses: Dict[str, float]
-    image_url: Optional[str] = None
+    category_bonuses: Dict[str, float] = {}
+    redemption_options: List[str] = []
+    welcome_benefits: str = ""
+    welcome_benefits_list: List[str] = []
+    welcome_bonus_conditions: Optional[str] = None
+    milestone_benefits: List[str] = []
+    milestone_details: List[Dict[str, str]] = []
+    travel_benefits: Optional[Dict[str, Any]] = None
+    lounge_access: str = ""
+    fuel_surcharge_waiver: bool = False
+    lifestyle_benefits: Optional[Dict[str, Any]] = None
+    fees_charges: Optional[Dict[str, Any]] = None
+    emi_available: bool = True
+    excluded_categories: List[str] = []
+    min_income: int = 0
+    min_credit_score: int = 700
+    eligibility_criteria: Optional[Dict[str, Any]] = None
+    pros: List[str] = []
+    cons: List[str] = []
+    similar_cards: List[str] = []
+    expert_rating: float = 4.0
+    expert_review: Optional[str] = None
+    user_reviews: List[Dict[str, Any]] = []
+    category_ratings: Dict[str, float] = {}
+    faqs: List[Dict[str, str]] = []
     affiliate_link: Optional[str] = None
     bankbazaar_link: Optional[str] = None
     paisabazaar_link: Optional[str] = None
+    bank_apply_link: Optional[str] = None
 
 class FilterRequest(BaseModel):
     monthly_spending: Optional[int] = None
@@ -112,6 +212,9 @@ class FilterRequest(BaseModel):
     min_credit_score: Optional[int] = None
     income_range: Optional[int] = None
     card_type: Optional[str] = None
+    card_network: Optional[str] = None
+    has_lounge_access: Optional[bool] = None
+    category_tag: Optional[str] = None
 
 class RewardCalculationRequest(BaseModel):
     card_id: str
@@ -171,6 +274,13 @@ async def get_admin_analytics(current_user: dict = Depends(get_current_admin)):
     lifetime_free = len([c for c in cards if c.get("is_lifetime_free")])
     premium_cards = len([c for c in cards if c.get("annual_fee", 0) > 5000])
     
+    # Count leads
+    total_leads = await leads_collection.count_documents({})
+    new_leads = await leads_collection.count_documents({"status": "new"})
+    
+    # Count reviews
+    total_reviews = await reviews_collection.count_documents({})
+    
     card_types = {}
     for card in cards:
         card_type = card.get("card_type", "other")
@@ -183,56 +293,58 @@ async def get_admin_analytics(current_user: dict = Depends(get_current_admin)):
         "lifetime_free_cards": lifetime_free,
         "premium_cards": premium_cards,
         "card_types": card_types,
+        "total_leads": total_leads,
+        "new_leads": new_leads,
+        "total_reviews": total_reviews,
         "recent_activity": []
     }
 
 @admin_router.post("/cards")
 async def create_card(card: AdminCardCreate, current_user: dict = Depends(get_current_admin)):
-    # Generate ID from card name
     card_id = f"{card.bank_name.lower().replace(' ', '-')}-{card.card_name.lower().replace(' ', '-')}"
     
-    # Check if card already exists
     existing = await cards_collection.find_one({"id": card_id})
     if existing:
         raise HTTPException(status_code=400, detail="Card with this ID already exists")
     
     new_card = {
         "id": card_id,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "is_active": True,
+        "user_reviews": [],
         **card.dict()
     }
     
     await cards_collection.insert_one(new_card)
-    
-    # Return without _id
     new_card.pop("_id", None)
     return {"message": "Card created successfully", "card": new_card}
 
 @admin_router.put("/cards/{card_id}")
 async def update_card(card_id: str, card: AdminCardCreate, current_user: dict = Depends(get_current_admin)):
-    # Check if card exists
     existing = await cards_collection.find_one({"id": card_id})
     if not existing:
         raise HTTPException(status_code=404, detail="Card not found")
     
     updated_card = {
         "id": card_id,
+        "updated_at": datetime.now(timezone.utc).isoformat(),
+        "created_at": existing.get("created_at"),
+        "user_reviews": existing.get("user_reviews", []),
+        "is_active": existing.get("is_active", True),
         **card.dict()
     }
     
     await cards_collection.update_one({"id": card_id}, {"$set": updated_card})
-    
     return {"message": "Card updated successfully", "card": updated_card}
 
 @admin_router.delete("/cards/{card_id}")
 async def delete_card(card_id: str, current_user: dict = Depends(get_current_admin)):
-    # Check if card exists
     existing = await cards_collection.find_one({"id": card_id})
     if not existing:
         raise HTTPException(status_code=404, detail="Card not found")
     
     await cards_collection.delete_one({"id": card_id})
-    
-    # Remove _id before returning
     existing.pop("_id", None)
     return {"message": "Card deleted successfully", "card": existing}
 
@@ -240,6 +352,31 @@ async def delete_card(card_id: str, current_user: dict = Depends(get_current_adm
 async def get_all_cards_admin(current_user: dict = Depends(get_current_admin)):
     return await get_cards_from_db()
 
+@admin_router.get("/leads")
+async def get_leads(current_user: dict = Depends(get_current_admin)):
+    leads = []
+    cursor = leads_collection.find({}, {"_id": 0}).sort("created_at", -1)
+    async for lead in cursor:
+        leads.append(lead)
+    return leads
+
+@admin_router.put("/leads/{lead_id}/status")
+async def update_lead_status(lead_id: str, status: str, current_user: dict = Depends(get_current_admin)):
+    await leads_collection.update_one(
+        {"id": lead_id},
+        {"$set": {"status": status, "updated_at": datetime.now(timezone.utc).isoformat()}}
+    )
+    return {"message": "Lead status updated"}
+
+@admin_router.get("/reviews")
+async def get_reviews_admin(current_user: dict = Depends(get_current_admin)):
+    reviews = []
+    cursor = reviews_collection.find({}, {"_id": 0}).sort("created_at", -1)
+    async for review in cursor:
+        reviews.append(review)
+    return reviews
+
+# Public API Routes
 @api_router.get("/")
 async def root():
     return {"message": "FinSelect India - Credit Card Comparison API"}
@@ -248,7 +385,9 @@ async def root():
 async def get_all_cards(
     card_type: Optional[str] = Query(None),
     bank_name: Optional[str] = Query(None),
-    is_lifetime_free: Optional[bool] = Query(None)
+    is_lifetime_free: Optional[bool] = Query(None),
+    card_network: Optional[str] = Query(None),
+    category_tag: Optional[str] = Query(None)
 ):
     cards_data = await get_cards_from_db()
     cards = [CreditCard(**card) for card in cards_data]
@@ -259,6 +398,10 @@ async def get_all_cards(
         cards = [c for c in cards if c.bank_name == bank_name]
     if is_lifetime_free is not None:
         cards = [c for c in cards if c.is_lifetime_free == is_lifetime_free]
+    if card_network:
+        cards = [c for c in cards if c.card_network == card_network]
+    if category_tag:
+        cards = [c for c in cards if category_tag in c.category_tags]
     
     return cards
 
@@ -267,6 +410,14 @@ async def get_card(card_id: str):
     card_data = await cards_collection.find_one({"id": card_id}, {"_id": 0})
     if not card_data:
         raise HTTPException(status_code=404, detail="Card not found")
+    
+    # Fetch reviews for this card
+    reviews = []
+    cursor = reviews_collection.find({"card_id": card_id}, {"_id": 0}).sort("created_at", -1).limit(10)
+    async for review in cursor:
+        reviews.append(review)
+    
+    card_data["user_reviews"] = reviews
     return CreditCard(**card_data)
 
 @api_router.post("/cards/filter", response_model=List[CreditCard])
@@ -293,6 +444,15 @@ async def filter_cards(filter_req: FilterRequest):
     if filter_req.card_type:
         cards = [c for c in cards if c.card_type == filter_req.card_type]
     
+    if filter_req.card_network:
+        cards = [c for c in cards if c.card_network == filter_req.card_network]
+    
+    if filter_req.has_lounge_access:
+        cards = [c for c in cards if c.lounge_access and c.lounge_access.lower() != "none"]
+    
+    if filter_req.category_tag:
+        cards = [c for c in cards if filter_req.category_tag in c.category_tags]
+    
     return cards
 
 @api_router.post("/calculate-rewards")
@@ -317,7 +477,7 @@ async def calculate_rewards(calc_req: RewardCalculationRequest):
             reward = card.reward_cap_monthly
         
         monthly_rewards += reward
-        category_breakdown[category] = reward
+        category_breakdown[category] = round(reward, 2)
     
     yearly_rewards = monthly_rewards * 12
     
@@ -382,6 +542,109 @@ async def get_best_cards_by_category():
         "best_premium_cards": [c.model_dump() for c in premium]
     }
 
+# Eligibility Check Endpoint
+@api_router.post("/check-eligibility")
+async def check_eligibility(req: EligibilityCheckRequest):
+    card_data = await cards_collection.find_one({"id": req.card_id}, {"_id": 0})
+    if not card_data:
+        raise HTTPException(status_code=404, detail="Card not found")
+    
+    card = CreditCard(**card_data)
+    
+    eligibility = card.eligibility_criteria or {}
+    min_age = eligibility.get("min_age", 21)
+    max_age = eligibility.get("max_age", 60)
+    min_income = card.min_income * 12  # Convert monthly to annual
+    min_credit_score = card.min_credit_score
+    
+    issues = []
+    is_eligible = True
+    
+    # Age check
+    if req.age < min_age:
+        issues.append(f"Minimum age requirement is {min_age} years")
+        is_eligible = False
+    if req.age > max_age:
+        issues.append(f"Maximum age limit is {max_age} years")
+        is_eligible = False
+    
+    # Income check
+    if req.annual_income < min_income:
+        issues.append(f"Minimum annual income required is ₹{min_income:,}")
+        is_eligible = False
+    
+    # Credit score check
+    if req.credit_score and req.credit_score < min_credit_score:
+        issues.append(f"Minimum credit score required is {min_credit_score}")
+        is_eligible = False
+    
+    return {
+        "card_id": req.card_id,
+        "card_name": f"{card.bank_name} {card.card_name}",
+        "is_eligible": is_eligible,
+        "issues": issues,
+        "requirements": {
+            "min_age": min_age,
+            "max_age": max_age,
+            "min_annual_income": min_income,
+            "min_credit_score": min_credit_score
+        }
+    }
+
+# Lead Capture Endpoint
+@api_router.post("/apply-lead")
+async def submit_lead(lead: LeadCapture):
+    lead_data = {
+        "id": str(uuid.uuid4()),
+        **lead.dict(),
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "status": "new"
+    }
+    
+    await leads_collection.insert_one(lead_data)
+    lead_data.pop("_id", None)
+    
+    return {
+        "message": "Application submitted successfully",
+        "lead_id": lead_data["id"],
+        "next_steps": "Our team will contact you within 24 hours"
+    }
+
+# Submit Review Endpoint
+@api_router.post("/cards/{card_id}/reviews")
+async def submit_review(card_id: str, review: ReviewSubmit):
+    card_data = await cards_collection.find_one({"id": card_id})
+    if not card_data:
+        raise HTTPException(status_code=404, detail="Card not found")
+    
+    review_data = {
+        "id": str(uuid.uuid4()),
+        "card_id": card_id,
+        "reviewer_name": review.reviewer_name,
+        "reviewer_type": "user",
+        "rating": review.rating,
+        "title": review.title,
+        "content": review.content,
+        "category_ratings": review.category_ratings,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "helpful_count": 0,
+        "verified_user": False
+    }
+    
+    await reviews_collection.insert_one(review_data)
+    review_data.pop("_id", None)
+    
+    return {"message": "Review submitted successfully", "review": review_data}
+
+# Get Reviews for Card
+@api_router.get("/cards/{card_id}/reviews")
+async def get_card_reviews(card_id: str):
+    reviews = []
+    cursor = reviews_collection.find({"card_id": card_id}, {"_id": 0}).sort("created_at", -1)
+    async for review in cursor:
+        reviews.append(review)
+    return reviews
+
 @api_router.post("/recommend-ai")
 async def ai_recommendation(req: AIRecommendationRequest):
     try:
@@ -428,6 +691,21 @@ async def get_banks():
     cards = await get_cards_from_db()
     banks = list(set([card["bank_name"] for card in cards]))
     return {"banks": sorted(banks)}
+
+@api_router.get("/networks")
+async def get_networks():
+    cards = await get_cards_from_db()
+    networks = list(set([card.get("card_network", "Visa") for card in cards]))
+    return {"networks": sorted(networks)}
+
+@api_router.get("/category-tags")
+async def get_category_tags():
+    cards = await get_cards_from_db()
+    tags = set()
+    for card in cards:
+        for tag in card.get("category_tags", []):
+            tags.add(tag)
+    return {"tags": sorted(list(tags))}
 
 app.include_router(api_router)
 app.include_router(admin_router)
