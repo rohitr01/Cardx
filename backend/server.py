@@ -48,6 +48,9 @@ class CreditCard(BaseModel):
     min_credit_score: int
     category_bonuses: Dict[str, float]
     image_url: Optional[str] = None
+    affiliate_link: Optional[str] = None
+    bankbazaar_link: Optional[str] = None
+    paisabazaar_link: Optional[str] = None
 
 class FilterRequest(BaseModel):
     monthly_spending: Optional[int] = None
