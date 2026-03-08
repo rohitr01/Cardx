@@ -1,0 +1,216 @@
+{
+  "design_system": {
+    "identity": {
+      "name": "FinSelect India",
+      "archetype": "The Performance Pro (Neo-Swiss Fintech)",
+      "core_values": ["Precision", "Wealth", "Clarity", "Trust"],
+      "mood": "High-contrast, professional, data-rich but breathable."
+    },
+    "typography": {
+      "font_family": {
+        "headings": "Space Grotesk, sans-serif",
+        "body": "Outfit, sans-serif",
+        "mono": "JetBrains Mono, monospace"
+      },
+      "rules": {
+        "headings": "Use Space Grotesk for all headings (h1-h6). Weight: 600 or 700. Tracking: tight (-0.02em).",
+        "body": "Use Outfit for all body text. Weight: 400 or 500. Line-height: relaxed.",
+        "numbers": "Use Space Grotesk for big data numbers (e.g., '₹5,000').",
+        "anti_pattern": "DO NOT use Inter or Roboto. Avoid default sans-serif."
+      },
+      "scale": {
+        "h1": "text-5xl md:text-6xl font-bold tracking-tight",
+        "h2": "text-3xl md:text-4xl font-semibold tracking-tight",
+        "h3": "text-2xl font-semibold tracking-tight",
+        "p": "text-base text-muted-foreground leading-relaxed",
+        "small": "text-sm font-medium uppercase tracking-wider text-muted-foreground"
+      },
+      "imports": [
+        "https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap"
+      ]
+    },
+    "colors": {
+      "palette": {
+        "primary": {
+          "DEFAULT": "#0F172A",
+          "foreground": "#F8FAFC",
+          "hover": "#1E293B"
+        },
+        "secondary": {
+          "DEFAULT": "#2563EB",
+          "foreground": "#FFFFFF",
+          "hover": "#1D4ED8"
+        },
+        "accent": {
+          "DEFAULT": "#F59E0B",
+          "foreground": "#FFFFFF",
+          "light": "#FEF3C7"
+        },
+        "background": {
+          "DEFAULT": "#FFFFFF",
+          "subtle": "#F8FAFC",
+          "dark": "#020617"
+        },
+        "surface": {
+          "DEFAULT": "#FFFFFF",
+          "hover": "#F1F5F9"
+        },
+        "success": "#10B981",
+        "warning": "#F59E0B",
+        "error": "#EF4444",
+        "text": {
+          "main": "#0F172A",
+          "muted": "#64748B",
+          "inverted": "#FFFFFF"
+        }
+      },
+      "usage": {
+        "brand_gradient": "bg-gradient-to-r from-slate-900 to-slate-800",
+        "card_bg": "bg-white",
+        "card_border": "border-slate-200",
+        "subtle_bg": "bg-slate-50"
+      },
+      "accessibility": "Ensure text contrast ratio > 4.5:1. Use Slate-900 for main text on white backgrounds."
+    },
+    "layout": {
+      "spacing_scale": {
+        "section_y": "py-24",
+        "container_padding": "px-6 md:px-12 lg:px-24",
+        "card_padding": "p-6 or p-8",
+        "gap_default": "gap-8"
+      },
+      "grid_system": {
+        "bento_grid": "grid grid-cols-1 md:grid-cols-3 gap-6",
+        "comparison_grid": "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6",
+        "dashboard_grid": "grid grid-cols-1 lg:grid-cols-12 gap-6"
+      },
+      "container": {
+        "max_width": "max-w-7xl mx-auto"
+      }
+    },
+    "components": {
+      "buttons": {
+        "primary": "rounded-full px-8 py-3 bg-slate-900 text-white hover:bg-slate-800 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-slate-900/20",
+        "secondary": "rounded-full px-8 py-3 bg-white border border-slate-200 text-slate-900 hover:bg-slate-50 transition-all hover:border-slate-300",
+        "ghost": "rounded-full px-4 py-2 hover:bg-slate-100 text-slate-600"
+      },
+      "cards": {
+        "style": "bg-white border border-slate-100 rounded-2xl shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300",
+        "glass": "bg-white/80 backdrop-blur-xl border border-white/20 shadow-xl",
+        "feature": "p-8 rounded-2xl bg-slate-50 border border-slate-100"
+      },
+      "inputs": {
+        "style": "h-12 rounded-lg border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all bg-white"
+      },
+      "badges": {
+        "style": "rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wide",
+        "premium": "bg-amber-100 text-amber-700",
+        "new": "bg-blue-100 text-blue-700",
+        "popular": "bg-emerald-100 text-emerald-700"
+      }
+    },
+    "visual_enhancers": {
+      "shadows": {
+        "card": "shadow-[0_2px_12px_-2px_rgba(0,0,0,0.08)]",
+        "floating": "shadow-[0_20px_40px_-12px_rgba(0,0,0,0.12)]",
+        "glow": "shadow-[0_0_20px_rgba(37,99,235,0.3)]"
+      },
+      "borders": {
+        "subtle": "border border-slate-100",
+        "highlight": "border-l-4 border-blue-500"
+      },
+      "motion": {
+        "hover_lift": "hover:-translate-y-1 transition-transform duration-300",
+        "fade_in": "animate-in fade-in slide-in-from-bottom-4 duration-700"
+      }
+    }
+  },
+  "assets": {
+    "images": [
+      {
+        "category": "Hero",
+        "description": "Professional Indian businessman working on laptop in modern office",
+        "url": "https://images.unsplash.com/photo-1770048532658-14834b7acef8?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NTYxODh8MHwxfHNlYXJjaHwxfHxpbmRpYW4lMjBidXNpbmVzc21hbiUyMHNtYXJ0cGhvbmUlMjBtb2Rlcm4lMjBvZmZpY2V8ZW58MHx8fHwxNzcyOTM2NTc5fDA&ixlib=rb-4.1.0&q=85",
+        "usage": "Hero section background or split layout image"
+      },
+      {
+        "category": "Travel",
+        "description": "Airplane wing view from window",
+        "url": "https://images.unsplash.com/photo-1694968126212-067a6b7f6726?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDk1Nzh8MHwxfHNlYXJjaHw0fHxhaXJwbGFuZSUyMHdpbmRvdyUyMHZpZXclMjB0cmF2ZWwlMjBsdXh1cnl8ZW58MHx8fHwxNzcyOTM2NTY2fDA&ixlib=rb-4.1.0&q=85",
+        "usage": "Travel category card or rewards section"
+      },
+      {
+        "category": "Shopping",
+        "description": "Luxury black shopping bag",
+        "url": "https://images.unsplash.com/photo-1765282946661-1975d58f9bf6?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA3MDB8MHwxfHNlYXJjaHw0fHxzaG9wcGluZyUyMGJhZ3MlMjBsdXh1cnklMjBmYXNoaW9ufGVufDB8fHx8MTc3MjkzNjU2N3ww&ixlib=rb-4.1.0&q=85",
+        "usage": "Shopping category card"
+      },
+      {
+        "category": "Fuel",
+        "description": "Gas pump close up",
+        "url": "https://images.unsplash.com/photo-1638425637198-f4ebe6ef341a?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzNTl8MHwxfHNlYXJjaHwyfHxnYXMlMjBzdGF0aW9uJTIwZnVlbCUyMHB1bXAlMjBjYXJ8ZW58MHx8fHwxNzcyOTM2NTgxfDA&ixlib=rb-4.1.0&q=85",
+        "usage": "Fuel category card"
+      },
+      {
+        "category": "Dining",
+        "description": "Fine dining dish",
+        "url": "https://images.unsplash.com/photo-1757358957218-67e771ec07bb?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjY2NzZ8MHwxfHNlYXJjaHwzfHxmaW5lJTIwZGluaW5nJTIwcmVzdGF1cmFudCUyMGZvb2R8ZW58MHx8fHwxNzcyOTM2NTgwfDA&ixlib=rb-4.1.0&q=85",
+        "usage": "Dining category card"
+      },
+      {
+        "category": "Mobile Payment",
+        "description": "Person holding phone next to coffee",
+        "url": "https://images.unsplash.com/photo-1707483618757-46eb1acc12e7?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA2OTV8MHwxfHNlYXJjaHwzfHxjcmVkaXQlMjBjYXJkJTIwaGFuZCUyMHBheW1lbnR8ZW58MHx8fHwxNzcyOTM2NTc5fDA&ixlib=rb-4.1.0&q=85",
+        "usage": "Features section or App download promo"
+      }
+    ],
+    "icons": {
+      "library": "lucide-react",
+      "style": "Stroke width 1.5px, size 20px or 24px."
+    }
+  },
+  "implementation_plan": {
+    "phases": [
+      {
+        "name": "Setup & Theming",
+        "steps": [
+          "Install 'Space Grotesk' and 'Outfit' fonts via Google Fonts in index.html.",
+          "Update tailwind.config.js with the new color palette (slate-900 primary, blue-600 secondary).",
+          "Set global CSS defaults: body font 'Outfit', headings 'Space Grotesk'."
+        ]
+      },
+      {
+        "name": "Core Components",
+        "steps": [
+          "Create 'CreditCard' component: A visual representation of a credit card using CSS gradients (Gold, Platinum, Black).",
+          "Create 'FeatureCard' component: Floating white card with icon and large text.",
+          "Create 'ComparisonTable' component: Sticky header, clear row separation, check/cross icons."
+        ]
+      },
+      {
+        "name": "Pages",
+        "steps": [
+          "Home: Hero with split layout (Text Left, Image Right). Quick filter bar floating over the hero bottom.",
+          "Card Listing: Sidebar filters (desktop) or Drawer (mobile). Grid of cards.",
+          "Comparison: Side-by-side view. Highlight differences."
+        ]
+      }
+    ]
+  },
+  "universal_guidelines": [
+    "Use 2-3x more spacing than typical designs. Use p-8 or p-12.",
+    "Do NOT use gradients for text. Use solid, high-contrast colors.",
+    "Every interaction needs micro-animations (hover states, scale).",
+    "Currency must be formatted as INR (₹). Example: ₹1,500.",
+    "Mobile-first: Images max-h-[50vh] on mobile.",
+    "Use 'sonner' for toast notifications.",
+    "Components must use named exports.",
+    "All interactive elements must have data-testid attributes."
+  ],
+  "anti_patterns": [
+    "No Inter font.",
+    "No purple/teal gradients (unless specific card art).",
+    "No centered text for long paragraphs.",
+    "No generic 'Bootstrap' column layouts. Use asymmetric grids."
+  ]
+}
