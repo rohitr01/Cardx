@@ -1,4 +1,5 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Query
+from fastapi import FastAPI, APIRouter, HTTPException, Query, Depends
+from fastapi.security import HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -7,9 +8,10 @@ import logging
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional, Dict, Any
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from emergentintegrations.llm.chat import LlmChat, UserMessage
 from cards_data import CREDIT_CARDS_DATABASE
+from auth import create_access_token, get_current_user, get_current_admin, security
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -20,6 +22,52 @@ db = client[os.environ['DB_NAME']]
 
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
+admin_router = APIRouter(prefix="/api/admin")
+
+# Auth Models
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+class LoginResponse(BaseModel):
+    token: str
+    user: Dict[str, Any]
+
+class AdminCardCreate(BaseModel):
+    bank_name: str
+    card_name: str
+    card_type: str
+    joining_fee: int
+    annual_fee: int
+    is_lifetime_free: bool
+    welcome_benefits: str
+    reward_rate: float
+    cashback_rate: float
+    redemption_ratio: float
+    redemption_options: List[str]
+    reward_cap_monthly: Optional[int] = None
+    reward_cap_yearly: Optional[int] = None
+    milestone_benefits: List[str]
+    excluded_categories: List[str]
+    forex_markup: float
+    lounge_access: str
+    fuel_surcharge_waiver: bool
+    emi_available: bool
+    min_income: int
+    min_credit_score: int
+    category_bonuses: Dict[str, float]
+    affiliate_link: Optional[str] = None
+    bankbazaar_link: Optional[str] = None
+    paisabazaar_link: Optional[str] = None
+
+# Hardcoded admin credentials (in production, use database with hashed passwords)
+ADMIN_USERS = {
+    "admin@finselect.in": {
+        "password": "admin123",  # In production, this should be hashed
+        "role": "admin",
+        "name": "Admin User"
+    }
+}
 
 class CreditCard(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -76,6 +124,131 @@ class AIRecommendationRequest(BaseModel):
 
 # Import card database from cards_data.py
 INDIAN_CREDIT_CARDS = CREDIT_CARDS_DATABASE
+
+# Store cards in memory (in production, use database)
+cards_storage = INDIAN_CREDIT_CARDS.copy()
+
+# Authentication Routes
+@api_router.post("/auth/login", response_model=LoginResponse)
+async def login(request: LoginRequest):
+    user = ADMIN_USERS.get(request.email)
+    if not user or user["password"] != request.password:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    
+    token_data = {
+        "email": request.email,
+        "role": user["role"],
+        "name": user["name"]
+    }
+    token = create_access_token(token_data)
+    
+    return {
+        "token": token,
+        "user": {
+            "email": request.email,
+            "name": user["name"],
+            "role": user["role"]
+        }
+    }
+
+@api_router.get("/auth/me")
+async def get_current_user_info(current_user: dict = Depends(get_current_user)):
+    return current_user
+
+# Admin Routes
+@admin_router.get("/analytics")
+async def get_admin_analytics(current_user: dict = Depends(get_current_admin)):
+    total_cards = len(cards_storage)
+    active_cards = len([c for c in cards_storage if c.get("is_active", True)])
+    banks = len(set([c["bank_name"] for c in cards_storage]))
+    lifetime_free = len([c for c in cards_storage if c.get("is_lifetime_free")])
+    premium_cards = len([c for c in cards_storage if c.get("annual_fee", 0) > 5000])
+    
+    card_types = {}
+    for card in cards_storage:
+        card_type = card.get("card_type", "other")
+        card_types[card_type] = card_types.get(card_type, 0) + 1
+    
+    return {
+        "total_cards": total_cards,
+        "active_cards": active_cards,
+        "total_banks": banks,
+        "lifetime_free_cards": lifetime_free,
+        "premium_cards": premium_cards,
+        "card_types": card_types,
+        "recent_activity": []
+    }
+
+@admin_router.post("/cards")
+async def create_card(card: AdminCardCreate, current_user: dict = Depends(get_current_admin)):
+    # Generate ID from card name
+    card_id = f"{card.bank_name.lower().replace(' ', '-')}-{card.card_name.lower().replace(' ', '-')}"
+    
+    new_card = {
+        "id": card_id,
+        **card.dict()
+    }
+    
+    # Check if card already exists
+    if any(c["id"] == card_id for c in cards_storage):
+        raise HTTPException(status_code=400, detail="Card with this ID already exists")
+    
+    cards_storage.append(new_card)
+    
+    # Update the global INDIAN_CREDIT_CARDS list
+    global INDIAN_CREDIT_CARDS
+    INDIAN_CREDIT_CARDS = cards_storage.copy()
+    
+    return {"message": "Card created successfully", "card": new_card}
+
+@admin_router.put("/cards/{card_id}")
+async def update_card(card_id: str, card: AdminCardCreate, current_user: dict = Depends(get_current_admin)):
+    # Find card index
+    card_index = None
+    for i, c in enumerate(cards_storage):
+        if c["id"] == card_id:
+            card_index = i
+            break
+    
+    if card_index is None:
+        raise HTTPException(status_code=404, detail="Card not found")
+    
+    updated_card = {
+        "id": card_id,
+        **card.dict()
+    }
+    
+    cards_storage[card_index] = updated_card
+    
+    # Update the global INDIAN_CREDIT_CARDS list
+    global INDIAN_CREDIT_CARDS
+    INDIAN_CREDIT_CARDS = cards_storage.copy()
+    
+    return {"message": "Card updated successfully", "card": updated_card}
+
+@admin_router.delete("/cards/{card_id}")
+async def delete_card(card_id: str, current_user: dict = Depends(get_current_admin)):
+    # Find and remove card
+    card_index = None
+    for i, c in enumerate(cards_storage):
+        if c["id"] == card_id:
+            card_index = i
+            break
+    
+    if card_index is None:
+        raise HTTPException(status_code=404, detail="Card not found")
+    
+    removed_card = cards_storage.pop(card_index)
+    
+    # Update the global INDIAN_CREDIT_CARDS list
+    global INDIAN_CREDIT_CARDS
+    INDIAN_CREDIT_CARDS = cards_storage.copy()
+    
+    return {"message": "Card deleted successfully", "card": removed_card}
+
+@admin_router.get("/cards")
+async def get_all_cards_admin(current_user: dict = Depends(get_current_admin)):
+    return cards_storage
 
 @api_router.get("/")
 async def root():
@@ -270,6 +443,7 @@ async def get_banks():
     return {"banks": sorted(banks)}
 
 app.include_router(api_router)
+app.include_router(admin_router)
 
 app.add_middleware(
     CORSMiddleware,
