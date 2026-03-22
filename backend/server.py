@@ -26,6 +26,7 @@ db = client[os.environ['DB_NAME']]
 cards_collection = db['credit_cards']
 reviews_collection = db['reviews']
 leads_collection = db['leads']
+users_collection = db['users']
 
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
@@ -264,6 +265,154 @@ async def login(request: LoginRequest):
 async def get_current_user_info(current_user: dict = Depends(get_current_user)):
     return current_user
 
+# User Registration Model
+class UserRegister(BaseModel):
+    name: str
+    email: str
+    password: str
+    phone: Optional[str] = None
+
+class UserUpdate(BaseModel):
+    name: Optional[str] = None
+    phone: Optional[str] = None
+
+# User Registration (Public users, not admin)
+@api_router.post("/auth/register")
+async def register_user(user: UserRegister):
+    # Check if user already exists
+    existing = await users_collection.find_one({"email": user.email})
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    # Create new user
+    new_user = {
+        "id": str(uuid.uuid4()),
+        "name": user.name,
+        "email": user.email,
+        "password": user.password,  # In production, hash this!
+        "phone": user.phone,
+        "role": "user",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "saved_cards": [],
+        "comparisons": []
+    }
+    
+    await users_collection.insert_one(new_user)
+    
+    # Generate token
+    token_data = {
+        "email": user.email,
+        "role": "user",
+        "name": user.name
+    }
+    token = create_access_token(token_data)
+    
+    return {
+        "token": token,
+        "user": {
+            "id": new_user["id"],
+            "email": user.email,
+            "name": user.name,
+            "role": "user"
+        }
+    }
+
+# User Login (for regular users)
+@api_router.post("/auth/user-login")
+async def user_login(request: LoginRequest):
+    # First check if it's an admin
+    admin_user = ADMIN_USERS.get(request.email)
+    if admin_user and admin_user["password"] == request.password:
+        token_data = {
+            "email": request.email,
+            "role": admin_user["role"],
+            "name": admin_user["name"]
+        }
+        token = create_access_token(token_data)
+        return {
+            "token": token,
+            "user": {
+                "email": request.email,
+                "name": admin_user["name"],
+                "role": admin_user["role"]
+            }
+        }
+    
+    # Check regular users
+    user = await users_collection.find_one({"email": request.email}, {"_id": 0})
+    if not user or user["password"] != request.password:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    
+    token_data = {
+        "email": request.email,
+        "role": user["role"],
+        "name": user["name"]
+    }
+    token = create_access_token(token_data)
+    
+    return {
+        "token": token,
+        "user": {
+            "id": user["id"],
+            "email": request.email,
+            "name": user["name"],
+            "role": user["role"],
+            "phone": user.get("phone")
+        }
+    }
+
+# Update user profile
+@api_router.put("/auth/profile")
+async def update_profile(update: UserUpdate, current_user: dict = Depends(get_current_user)):
+    update_data = {}
+    if update.name:
+        update_data["name"] = update.name
+    if update.phone:
+        update_data["phone"] = update.phone
+    
+    if update_data:
+        await users_collection.update_one(
+            {"email": current_user["email"]},
+            {"$set": update_data}
+        )
+    
+    user = await users_collection.find_one({"email": current_user["email"]}, {"_id": 0, "password": 0})
+    return user
+
+# Save card to favorites
+@api_router.post("/auth/save-card/{card_id}")
+async def save_card(card_id: str, current_user: dict = Depends(get_current_user)):
+    await users_collection.update_one(
+        {"email": current_user["email"]},
+        {"$addToSet": {"saved_cards": card_id}}
+    )
+    return {"message": "Card saved to favorites"}
+
+# Remove card from favorites
+@api_router.delete("/auth/save-card/{card_id}")
+async def remove_saved_card(card_id: str, current_user: dict = Depends(get_current_user)):
+    await users_collection.update_one(
+        {"email": current_user["email"]},
+        {"$pull": {"saved_cards": card_id}}
+    )
+    return {"message": "Card removed from favorites"}
+
+# Get saved cards
+@api_router.get("/auth/saved-cards")
+async def get_saved_cards(current_user: dict = Depends(get_current_user)):
+    user = await users_collection.find_one({"email": current_user["email"]}, {"_id": 0})
+    if not user:
+        return {"saved_cards": []}
+    
+    saved_ids = user.get("saved_cards", [])
+    cards = []
+    for card_id in saved_ids:
+        card = await cards_collection.find_one({"id": card_id}, {"_id": 0})
+        if card:
+            cards.append(card)
+    
+    return {"saved_cards": cards}
+
 # Admin Routes
 @admin_router.get("/analytics")
 async def get_admin_analytics(current_user: dict = Depends(get_current_admin)):
@@ -281,6 +430,9 @@ async def get_admin_analytics(current_user: dict = Depends(get_current_admin)):
     # Count reviews
     total_reviews = await reviews_collection.count_documents({})
     
+    # Count users
+    total_users = await users_collection.count_documents({})
+    
     card_types = {}
     for card in cards:
         card_type = card.get("card_type", "other")
@@ -296,6 +448,7 @@ async def get_admin_analytics(current_user: dict = Depends(get_current_admin)):
         "total_leads": total_leads,
         "new_leads": new_leads,
         "total_reviews": total_reviews,
+        "total_users": total_users,
         "recent_activity": []
     }
 

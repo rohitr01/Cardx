@@ -18,16 +18,15 @@ export const AdminLoginPage = () => {
     e.preventDefault();
     setLoading(true);
 
-    const result = await login(email, password);
-    
-    if (result.success) {
+    try {
+      await login(email, password, true);
       toast.success('Login successful!');
       navigate('/admin/dashboard');
-    } else {
-      toast.error(result.error || 'Login failed');
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Login failed');
+    } finally {
+      setLoading(false);
     }
-    
-    setLoading(false);
   };
 
   return (
